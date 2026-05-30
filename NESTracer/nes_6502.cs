@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.DirectoryServices.ActiveDirectory;
 using System.Net;
 
@@ -44,10 +44,28 @@ namespace NESTracer
         public nes_6502()
         {
             initialize();
+            initialize_2A03();
         }
         public void run(float in_clock)
         {
-            int w_interrupt_clock = interrupt_chk();
+            int w_interrupt_clock = 0;
+            if (g_cpu_halted == true)
+            {
+                if (interrupt_RESET == true)
+                {
+                    w_interrupt_clock = interrupt_chk();
+                }
+                else
+                {
+                    g_clock_total = 0;
+                    return;
+                }
+            }
+            else
+            {
+                w_interrupt_clock = interrupt_chk();
+            }
+
             int w_sprite_hit_cnt = nes_main.g_nes_ppu.get_sprite_zero_hit();
 
             g_clock_total += in_clock;
@@ -77,6 +95,7 @@ namespace NESTracer
             if (interrupt_RESET == true)
             {
                 interrupt_RESET = false;
+                g_cpu_halted = false;
                 g_flag_I = true;
                 g_reg_PC = nes_main.g_nes_bus.read2(0xfffc);
             }
