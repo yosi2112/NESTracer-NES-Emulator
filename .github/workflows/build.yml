@@ -24,3 +24,12 @@ jobs:
 
       - name: Build
         run: dotnet build NESTracer/NESTracer.csproj --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish NESTracer/NESTracer.csproj --configuration Release --no-build --output artifacts/NESTracer
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NESTracer-Windows-Release
+          path: artifacts/NESTracer
